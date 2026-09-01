@@ -9,7 +9,8 @@ RUN apk add --no-cache \
     bison \
     build-base \
     ca-certificates \
-    git
+    git \
+    ruby
 
 COPY go.mod go.sum ./
 COPY vendorlib ./vendorlib
