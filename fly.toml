@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'thqnam-nextjs-anycable'
+app = 'thqnam-anycable-go'
 primary_region = 'sin'
 
 [build]
@@ -17,7 +17,7 @@ primary_region = 'sin'
   processes = ['app']
 
 [[vm]]
-  memory = '2gb'
-  cpu_kind = 'shared'
-  cpus = 1
-  memory_mb = 2048
+  memory = '32gb'
+  cpu_kind = 'performance'
+  cpus = 16
+  memory_mb = 32768
