@@ -10,12 +10,15 @@ RUN apk add --no-cache \
     build-base \
     ca-certificates \
     git \
-    ruby
+    ruby \
+    ruby-dev
 
 COPY go.mod go.sum ./
 COPY vendorlib ./vendorlib
 
 RUN go mod vendor
+
+RUN gem install getoptlong --no-document
 
 RUN cd vendorlib/go-mruby && \
     MRUBY_CONFIG=../../etc/build_config.rb make libmruby.a
