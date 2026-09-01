@@ -27,6 +27,7 @@ WORKDIR /src
 
 RUN apk add --no-cache \
     bash \
+    build-base \
     ca-certificates \
     git
 
@@ -35,11 +36,11 @@ COPY vendorlib ./vendorlib
 COPY etc ./etc
 COPY . .
 
-RUN go mod vendor
+RUN go mod download
 COPY --from=mruby-build /src/vendorlib/go-mruby/libmruby.a /src/vendorlib/go-mruby/libmruby.a
 COPY --from=mruby-build /src/vendorlib/go-mruby/mruby-build /src/vendorlib/go-mruby/mruby-build
 
-RUN CGO_ENABLED=1 GOFLAGS="-mod=vendor" go build \
+RUN CGO_ENABLED=1 go build \
     -tags "mrb gops" \
     -ldflags "-s -w" \
     -o /out/anycable-go ./cmd/anycable-go
