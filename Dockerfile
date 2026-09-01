@@ -1,40 +1,38 @@
-ARG RUBY_VERSION=3.1.6
-FROM ruby:$RUBY_VERSION-slim as base
+# syntax=docker/dockerfile:1
 
-# Rack app lives here
+FROM golang:1.23-alpine AS build
+
+WORKDIR /src
+
+RUN apk add --no-cache \
+    bash \
+    bison \
+    build-base \
+    ca-certificates \
+    git
+
+COPY go.mod go.sum ./
+COPY vendorlib ./vendorlib
+
+RUN go mod vendor
+
+RUN cd vendorlib/go-mruby && \
+    MRUBY_CONFIG=../../etc/build_config.rb make libmruby.a
+
+COPY . .
+
+RUN CGO_ENABLED=1 GOFLAGS="-mod=vendor" go build \
+    -tags "mrb gops" \
+    -ldflags "-s -w" \
+    -o /out/anycable-go ./cmd/anycable-go
+
+FROM alpine:3.20
+
+RUN apk add --no-cache ca-certificates
+
 WORKDIR /app
+COPY --from=build /out/anycable-go /usr/local/bin/anycable-go
 
-# Update gems and bundler
-RUN gem update --system --no-document && \
-    gem install -N bundler
-
-
-# Throw-away build stage to reduce size of final image
-FROM base as build
-
-# Install packages needed to build gems
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential
-
-# Install application gems
-COPY Gemfile* .
-RUN bundle install
-
-
-# Final stage for app image
-FROM base
-
-# Run and own the application files as a non-root user for security
-RUN useradd ruby --home /app --shell /bin/bash
-USER ruby:ruby
-
-# Copy built artifacts: gems, application
-COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build --chown=ruby:ruby /app /app
-
-# Copy application code
-COPY --chown=ruby:ruby . .
-
-# Start the server
 EXPOSE 8080
-CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0", "--port", "8080"]
+
+ENTRYPOINT ["/usr/local/bin/anycable-go"]
