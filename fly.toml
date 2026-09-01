@@ -1,5 +1,7 @@
-# Fly.io configuration for AnyCable Go backend
-# See: https://fly.io/docs/reference/configuration/
+# fly.toml app configuration file generated for thqnam-anycable-go on 2026-09-01T14:52:45Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = 'thqnam-anycable-go'
 primary_region = 'sin'
@@ -10,12 +12,13 @@ primary_region = 'sin'
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_start_machines = true
   auto_stop_machines = 'off'
+  auto_start_machines = true
   min_machines_running = 1
   processes = ['app']
 
 [[vm]]
+  memory = '2gb'
   cpu_kind = 'shared'
   cpus = 1
-  memory = '2gb'
+  memory_mb = 2048
