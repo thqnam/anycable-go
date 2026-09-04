@@ -19,11 +19,6 @@ primary_region = 'sin'
 
 [[vm]]
   cpu_kind = 'shared'
-  cpus = 2
-  memory = '4gb'
-
-[[vm]]
-  cpu_kind = 'shared'
   cpus = 1
   memory = '2gb'
   memory_mb = 2048
